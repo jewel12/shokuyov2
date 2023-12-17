@@ -1,0 +1,21 @@
+{
+  "name": "shokuyov2",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231121.0",
+    "bun-types": "latest",
+    "wrangler": "^3.21.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.1.11",
+    "hono": "^3.11.7"
+  },
+  "scripts": {
+    "start": "wrangler dev index.tsx",
+    "deploy": "wrangler deploy index.tsx"
+  }
+}
