@@ -42,9 +42,9 @@ const Top: FC = () => {
         <form hx-post="/edible" hx-target="#result" hx-target-error="#result">
           <input type="text" name="name" />
           <input type="submit" value="食用" />
+          <p class="htmx-indicator">審議中...</p>
         </form>
         <div id="result">
-          <p class="htmx-indicator">loading...</p>
         </div>
       </body>
     </html>
