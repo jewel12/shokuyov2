@@ -30,13 +30,14 @@ const Top: FC = () => {
   );
 };
 
-const Shokuyo: FC<{ name: string; edible: boolean }> = (props: {
+const Shokuyo: FC<{ name: string; edible: boolean, imageUrl: string }> = (props: {
   name: string;
   edible: boolean;
+  imageUrl: string;
 }) => {
   return (
     <>
-      <div>ここに画像</div>
+      <img src={props.imageUrl} />
       <b>
         {props.name}は{props.edible ? "食べられます！" : "食べられません"}
       </b>
@@ -75,6 +76,20 @@ const checkEdible = async (name: string, apiKey: string): Promise<boolean> => {
   return chatres.choices[0]?.message.content == "食べられる";
 };
 
+const generateImageUrl = async (
+  name: string,
+  apiKey: string
+): Promise<string> => {
+  const openai = new OpenAI({ apiKey: apiKey });
+  const res = await openai.images.generate({
+    model: "dall-e-3",
+    prompt: name,
+    n: 1,
+    size: "1024x1024",
+  });
+  return res.data[0].url!;
+};
+
 app.get("/", (c) => c.html(<Top />));
 
 app.post(
@@ -83,8 +98,9 @@ app.post(
   async (c) => {
     const name = c.req.valid("form").name;
     const env = c.env as Env;
-    const edi = await checkEdible(name, env.OPENAI_API_KEY);
-    return c.html(<Shokuyo name={name} edible={edi} />);
+    const edible = await checkEdible(name, env.OPENAI_API_KEY);
+    const imageUrl = await generateImageUrl(name, env.OPENAI_API_KEY);
+    return c.html(<Shokuyo name={name} edible={edible} imageUrl={imageUrl}/>);
   }
 );
 
