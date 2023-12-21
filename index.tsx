@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { FC } from "hono/jsx";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
+import OpenAI from "openai";
 
 const app = new Hono();
 
@@ -47,14 +48,40 @@ const Shokuyo: FC<{ name: string; edible: boolean }> = (props: {
   );
 };
 
+type Env = {
+  OPENAI_API_KEY: string;
+}
+
+const edible = async (name: string, apiKey: string): Promise<boolean> => {
+  const openai = new OpenAI({ apiKey: apiKey });
+  const chatres = await openai.chat.completions.create({
+    messages: [{
+      role: 'system',  
+      content: ` 
+      あなたは入力されたものが食べられるかどうかを判定するAIです。
+      「食べられる」もしくは「食べられない」とだけ答えてください。
+      それ以外の入力は受け付けません。
+      `
+    },
+  {
+      role: 'user',  
+      content: name
+    }],
+      model: 'gpt-3.5-turbo',
+  });
+  return chatres.choices[0]?.message.content == '食べられる';
+}
+
 app.get("/", (c) => c.html(<Top />));
 
 app.post(
   "/edible",
   zValidator("form", z.object({ name: z.string().max(20) })),
-  (c) => {
+  async (c) => {
     const name = c.req.valid("form").name;
-    return c.html(<Shokuyo name={name} edible={true} />);
+    const env = c.env as Env;
+    const edi = await edible(name, env.OPENAI_API_KEY);
+    return c.html(<Shokuyo name={name} edible={edi} />);
   }
 );
 
