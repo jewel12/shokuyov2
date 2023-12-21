@@ -50,27 +50,29 @@ const Shokuyo: FC<{ name: string; edible: boolean }> = (props: {
 
 type Env = {
   OPENAI_API_KEY: string;
-}
+};
 
 const edible = async (name: string, apiKey: string): Promise<boolean> => {
   const openai = new OpenAI({ apiKey: apiKey });
   const chatres = await openai.chat.completions.create({
-    messages: [{
-      role: 'system',  
-      content: ` 
+    messages: [
+      {
+        role: "system",
+        content: ` 
       あなたは入力されたものが食べられるかどうかを判定するAIです。
       「食べられる」もしくは「食べられない」とだけ答えてください。
       それ以外の入力は受け付けません。
-      `
-    },
-  {
-      role: 'user',  
-      content: name
-    }],
-      model: 'gpt-3.5-turbo',
+      `,
+      },
+      {
+        role: "user",
+        content: name,
+      },
+    ],
+    model: "gpt-3.5-turbo",
   });
-  return chatres.choices[0]?.message.content == '食べられる';
-}
+  return chatres.choices[0]?.message.content == "食べられる";
+};
 
 app.get("/", (c) => c.html(<Top />));
 
