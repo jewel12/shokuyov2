@@ -75,10 +75,6 @@ const Shokuyo: FC<{
   );
 };
 
-type Env = {
-  OPENAI_API_KEY: string;
-};
-
 const checkEdible = async (name: string, apiKey: string): Promise<boolean> => {
   const openai = new OpenAI({ apiKey: apiKey });
   const chatres = await openai.chat.completions.create({
@@ -115,6 +111,10 @@ const generateImageUrl = async (
     size: "1024x1024",
   });
   return res.data[0].url!;
+};
+
+type Env = {
+  OPENAI_API_KEY: string;
 };
 
 app.get("/", (c) => c.html(<Top />));
